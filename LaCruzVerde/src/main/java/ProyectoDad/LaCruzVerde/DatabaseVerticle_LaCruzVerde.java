@@ -21,7 +21,7 @@ import types.planta;
 import types.sensor;
 import types.dispositivo;
 
-public class DatabaseVerticle extends AbstractVerticle {
+public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 
 	private MySQLPool mySQLPool;
 
