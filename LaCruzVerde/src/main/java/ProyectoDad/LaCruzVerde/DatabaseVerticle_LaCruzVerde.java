@@ -57,6 +57,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 		//Get y Put sensor
 		router.get("/api/sensor/:id_sensor").handler(this::get_sensor);
 		router.put("/api/sensor").handler(this::put_sensor);
+		
 		//Get y Put dispositivo
 		router.get("/api/dispositivo/:id_dispositivo").handler(this::get_dispositivo);
 		router.put("/api/dispositivo").handler(this::put_dispositivo);
