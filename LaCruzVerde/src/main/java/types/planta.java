@@ -8,6 +8,10 @@ public class planta {
 	private float humed_tierra_planta;
 	private float humed_amb_planta;
 	
+	public planta() {
+		super();
+	}
+	
 	public planta(int id_planta, String nombre_planta, float temp_amb_planta, float humed_tierra_planta, float humed_amb_planta) {
 		super();
 		this.id_planta = id_planta;

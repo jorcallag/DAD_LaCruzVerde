@@ -8,6 +8,10 @@ public class dispositivo {
 	private int id_planta;
 	private long tiempoInicial;
 	
+	public dispositivo() {
+		super();
+	}
+	
 	public dispositivo(int id_dispositivo, String ip, String nombre, int id_planta, long tiempoInicial) {
 		super();
 		this.id_dispositivo = id_dispositivo;

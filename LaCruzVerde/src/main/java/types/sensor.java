@@ -7,6 +7,10 @@ public class sensor {
 	private String nombre;
 	private int id_dispositivo;
 	
+	public sensor() {
+		super();
+	}
+	
 	public sensor(int id_sensor, String tipo, String nombre, int id_dispositivo) {
 		super();
 		this.id_sensor = id_sensor;

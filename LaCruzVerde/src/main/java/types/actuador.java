@@ -7,6 +7,10 @@ public class actuador {
 	private String nombre;
 	private int id_dispositivo;
 	
+	public actuador() {
+		super();
+	}
+	
 	public actuador(int id_actuador, String tipo, String nombre, int id_dispositivo) {
 		super();
 		this.id_actuador = id_actuador;
