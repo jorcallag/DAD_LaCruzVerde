@@ -114,27 +114,6 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 	}
 
 	//Metodo Put para planta
-//	private void post_planta(RoutingContext routingContext) {
-//		JsonObject planta = routingContext.getBodyAsJson();
-//		System.out.println(planta);
-//		mySQLPool.query("INSERT INTO daddatabase.dispositivo VALUES (" + planta.getInteger("id_planta") + "," + planta.getString("nombre_planta") + "," + planta.getFloat("temp_amb_planta") + "," +
-//				planta.getFloat("humed_tierra_planta") + "," + planta.getFloat("humed_amb_planta") +")" , 
-//				handler -> {
-//					if (handler.succeeded()) {
-//						System.out.println("Añadida correctamente");
-//						System.out.println(handler.result().rowCount());
-//
-//						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-//						.end(planta.encodePrettily());
-//					} else {
-//						System.out.println("Algo salió mal");
-//						System.out.println(handler.cause().toString());
-//						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-//						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
-//					}
-//				});
-//	}
-	
 	private void put_planta(RoutingContext routingContext) {
 		planta planta = Json.decodeValue(routingContext.getBodyAsString(), planta.class);
 		System.out.println(planta.toString());
@@ -230,27 +209,6 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 	}
 
 	//Metodo Put para dispositivo
-//	private void post_dispositivo(RoutingContext routingContext) {
-//		JsonObject dispositivo = routingContext.getBodyAsJson();
-//		System.out.println(dispositivo);
-//		mySQLPool.query("INSERT INTO daddatabase.dispositivo VALUES (" + dispositivo.getInteger("id_dispositivo") + "," + dispositivo.getString("ip") + "," + dispositivo.getString("nombre") + "," +
-//				dispositivo.getInteger("id_planta") + "," + dispositivo.getLong("tiempoInicial") +")" , 
-//				handler -> {
-//					if (handler.succeeded()) {
-//						System.out.println("Añadida correctamente");
-//						System.out.println(handler.result().rowCount());
-//
-//						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-//						.end(dispositivo.encodePrettily());
-//					} else {
-//						System.out.println("Algo salió mal");
-//						System.out.println(handler.cause().toString());
-//						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-//						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
-//					}
-//				});
-//	}
-	
 	private void put_dispositivo(RoutingContext routingContext) {
 		dispositivo dispositivo = Json.decodeValue(routingContext.getBodyAsString(), dispositivo.class);
 		System.out.println(dispositivo.toString());
