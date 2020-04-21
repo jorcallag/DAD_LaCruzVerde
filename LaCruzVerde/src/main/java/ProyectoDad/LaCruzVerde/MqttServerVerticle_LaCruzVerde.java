@@ -15,7 +15,7 @@ import io.vertx.mqtt.MqttServer;
 import io.vertx.mqtt.MqttServerOptions;
 import io.vertx.mqtt.MqttTopicSubscription;
 
-public class MqttServerVerticle_LACruzVerde extends AbstractVerticle{
+public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 	
 	public static final String TOPIC_LIGHTS = "lights";
 	public static final String TOPIC_INFO = "info";
@@ -25,10 +25,10 @@ public class MqttServerVerticle_LACruzVerde extends AbstractVerticle{
 	
 	public void start (Promise<Void> promise) {
 		
-		MqttServerOptions opciones = new MqttServerOptions();
-		opciones.setPort(1885);
-		opciones.setClientAuth(ClientAuth.REQUIRED);
-		MqttServer mqttServer = MqttServer.create(vertx, opciones);
+		MqttServerOptions options = new MqttServerOptions();
+		options.setPort(1885);
+		options.setClientAuth(ClientAuth.REQUIRED);
+		MqttServer mqttServer = MqttServer.create(vertx, options);
 		init(mqttServer);
 		
 	}
