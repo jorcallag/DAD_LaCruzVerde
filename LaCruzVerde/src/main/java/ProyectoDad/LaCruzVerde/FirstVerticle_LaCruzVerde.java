@@ -13,7 +13,6 @@ public class FirstVerticle_LaCruzVerde extends AbstractVerticle {
 		
 		vertx.deployVerticle(MqttServerVerticle_LaCruzVerde.class.getName());
 		vertx.deployVerticle(MqttClientVerticle_LaCruzVerde.class.getName());
-		vertx.deployVerticle(MqttClientVerticle_LaCruzVerde.class.getName());
 
 	}
 }

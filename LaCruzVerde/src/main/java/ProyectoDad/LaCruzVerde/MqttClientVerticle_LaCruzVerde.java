@@ -12,6 +12,12 @@ import io.vertx.core.json.Json;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import io.vertx.mqtt.impl.MqttClientImpl;
+
+import types.actuador;
+import types.actuador_valor;
+import types.dispositivo;
+import types.planta;
+import types.sensor;
 import types.sensor_valor;
 
 public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
@@ -35,24 +41,128 @@ public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
 			System.out.println(messageReceivedHandler.payload().toString());
 		});
 		
+		//TOPIC PLANTA
 		mqttClient.connect(1885, "localhost", handler -> {
-			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_DOMO, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-					if(handlerSubscribe.succeeded()) {
-						System.out.println(classInstanceId + " subscribed to " + MqttServerVerticle_LaCruzVerde.TOPIC_DOMO + " topic");
-						vertx.setPeriodic(8000, periodic -> {
-							Random random = new Random();
-							sensor_valor sensor_valor = new sensor_valor(1, 1, 37 + random.nextInt(10), 2 + random.nextInt(5), Calendar.getInstance().getTimeInMillis());
-							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_DOMO, Buffer.buffer(Json.encodePrettily(sensor_valor)),
-									MqttQoS.AT_LEAST_ONCE, false, true);
-						});
-					}else {
-						System.out.println(classInstanceId + " NOT subscribe to " + MqttServerVerticle_LaCruzVerde.TOPIC_DOMO + " topic");
-					}
-				});
-			}else {
-				System.out.println("Error: " + handler.result().code());
-			}
-		});
+		if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+			mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+				if(handlerSubscribe.succeeded()) {
+					System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
+					vertx.setPeriodic(10000, periodic -> {
+						planta planta = new planta(1, "Aloevera", 22, 25, 5);
+						mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, Buffer.buffer(Json.encodePrettily(planta)),
+								MqttQoS.AT_LEAST_ONCE, false, true);
+					});
+				}else {
+					System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
+				}
+			});
+		}else {
+			System.out.println("Error: " + handler.result().code());
+		}
+	});		
+				
+		//TOPIC DISPOSITIVO
+//		mqttClient.connect(1885, "localhost", handler -> {
+//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+//					if(handlerSubscribe.succeeded()) {
+//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
+//						vertx.setPeriodic(10000, periodic -> {
+//							Random random = new Random();
+//							dispositivo dispositivo = new dispositivo(random.nextInt(100), random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200), 
+//									"CruzVerde_Aloevera", 1, Calendar.getInstance().getTimeInMillis());
+//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, Buffer.buffer(Json.encodePrettily(dispositivo)),
+//									MqttQoS.AT_LEAST_ONCE, false, true);
+//						});
+//					}else {
+//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
+//					}
+//				});
+//			}else {
+//				System.out.println("Error: " + handler.result().code());
+//			}
+//		});
+		
+		//TOPIC SENSOR
+//		mqttClient.connect(1885, "localhost", handler -> {
+//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+//					if(handlerSubscribe.succeeded()) {
+//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
+//						vertx.setPeriodic(10000, periodic -> {
+//							sensor sensor = new sensor(7, "temp_amb", "temp_amb_aloevera", 1);
+//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, Buffer.buffer(Json.encodePrettily(sensor)),
+//									MqttQoS.AT_LEAST_ONCE, false, true);
+//						});
+//					}else {
+//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
+//					}
+//				});
+//			}else {
+//				System.out.println("Error: " + handler.result().code());
+//			}
+//		});
+		
+		//TOPIC SESNOR_VALOR
+//		mqttClient.connect(1885, "localhost", handler -> {
+//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+//					if(handlerSubscribe.succeeded()) {
+//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
+//						vertx.setPeriodic(10000, periodic -> {
+//							Random random = new Random();
+//							sensor_valor sensor_valor = new sensor_valor(random.nextInt(100), 7, 30 + random.nextInt(8), random.nextInt(3), Calendar.getInstance().getTimeInMillis());
+//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, Buffer.buffer(Json.encodePrettily(sensor_valor)),
+//									MqttQoS.AT_LEAST_ONCE, false, true);
+//						});
+//					}else {
+//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
+//					}
+//				});
+//			}else {
+//				System.out.println("Error: " + handler.result().code());
+//			}
+//		});
+		
+		//TOPIC ACTUADOR
+//				mqttClient.connect(1885, "localhost", handler -> {
+//					if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+//						mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+//							if(handlerSubscribe.succeeded()) {
+//								System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
+//								vertx.setPeriodic(10000, periodic -> {
+//									actuador actuador = new actuador(2, "luz", "luz_aloevera", 1);
+//									mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, Buffer.buffer(Json.encodePrettily(actuador)),
+//											MqttQoS.AT_LEAST_ONCE, false, true);
+//								});
+//							}else {
+//								System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
+//							}
+//						});
+//					}else {
+//						System.out.println("Error: " + handler.result().code());
+//					}
+//				});
+				
+		//TOPIC ACTUADOR_VALOR
+//		mqttClient.connect(1885, "localhost", handler -> {
+//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+//					if(handlerSubscribe.succeeded()) {
+//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
+//						vertx.setPeriodic(10000, periodic -> {
+//							Random random = new Random();
+//							actuador_valor actuador_valor = new actuador_valor(random.nextInt(100), 2, random.nextBoolean(), Calendar.getInstance().getTimeInMillis());
+//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, Buffer.buffer(Json.encodePrettily(actuador_valor)),
+//									MqttQoS.AT_LEAST_ONCE, false, true);
+//						});
+//					}else {
+//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
+//					}
+//				});
+//			}else {
+//				System.out.println("Error: " + handler.result().code());
+//			}
+//		});
 	}
 }

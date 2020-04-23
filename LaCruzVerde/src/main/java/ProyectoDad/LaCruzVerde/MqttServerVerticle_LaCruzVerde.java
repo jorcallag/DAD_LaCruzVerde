@@ -17,9 +17,12 @@ import io.vertx.mqtt.MqttTopicSubscription;
 
 public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 	
-	public static final String TOPIC_LIGHTS = "lights";
-	public static final String TOPIC_INFO = "info";
-	public static final String TOPIC_DOMO = "domo";
+	public static final String TOPIC_ACTUADOR = "actuador";
+	public static final String TOPIC_ACTUADOR_VALOR = "actuador_valor";
+	public static final String TOPIC_SENSOR = "sensor";
+	public static final String TOPIC_SENSOR_VALOR = "sensor_valor";
+	public static final String TOPIC_DISPOSITIVO = "dispositivo";
+	public static final String TOPIC_PLANTA = "planta";
 	
 	private static final SetMultimap<String, MqttEndpoint> clients = LinkedHashMultimap.create();
 	
@@ -35,8 +38,8 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 	
 	public void init(MqttServer mqttSever) {
 		mqttSever.endpointHandler(endpoint -> {
-			System.out.println("MQTT Client [" + endpoint.clientIdentifier() + 
-					"] request to connect, clean session = " + endpoint.isCleanSession());
+			System.out.println("Cliente MQTT [" + endpoint.clientIdentifier() + 
+					"] solicita conexion. Sesion limpia = " + endpoint.isCleanSession());
 			if(endpoint.auth().getUsername().contentEquals("mqttbroker") && endpoint.auth().getPassword().contentEquals("mqttbrokerpass")) {
 				endpoint.accept();
 				handleSubscription(endpoint);
@@ -48,9 +51,9 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 			}
 		}).listen(ar -> {
 			if(ar.succeeded()) {
-				System.out.println("MQTT server is listening on port " + ar.result().actualPort());
+				System.out.println("El servidor MQTT se esta ejecutando en el puerto: " + ar.result().actualPort());
 			}else {
-				System.out.println("Error on starting the server");
+				System.out.println("Error al iniciar servidor MQTT");
 				ar.cause().printStackTrace();
 			}
 		});
@@ -60,7 +63,7 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 		endpoint.subscribeHandler(subscribe -> {
 			List<MqttQoS> grantedQoSLevels = new ArrayList<>();
 			for(MqttTopicSubscription s : subscribe.topicSubscriptions()) {
-				System.out.println("Subscription for " + s.topicName() + " with QoS " + s.qualityOfService());
+				System.out.println("Suscripcion de " + s.topicName() + " con QoS " + s.qualityOfService());
 				grantedQoSLevels.add(s.qualityOfService());
 				clients.put(s.topicName(), endpoint);
 			}
@@ -71,7 +74,7 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 	private void handleUnsubscription(MqttEndpoint endpoint) {
 		endpoint.unsubscribeHandler(unsuscribe -> {
 			for(String t : unsuscribe.topics()) {
-				System.out.println("Unsuscribe for " + t);
+				System.out.println("Desuscripcion de " + t);
 				clients.remove(t, endpoint);
 			}
 			endpoint.unsubscribeAcknowledge(unsuscribe.messageId());
@@ -82,7 +85,7 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 		endpoint.publishHandler(message -> {
 			if(message.qosLevel() == MqttQoS.AT_LEAST_ONCE) {
 				String topicName = message.topicName();
-				System.out.println("New message published in " + topicName);
+				System.out.println("Nuevo mensaje publicado en " + topicName);
 				for(MqttEndpoint subscribed : clients.get(topicName)) {
 					subscribed.publish(message.topicName(), message.payload(), message.qosLevel(), message.isDup(), message.isRetain());
 				}
@@ -97,7 +100,7 @@ public class MqttServerVerticle_LaCruzVerde extends AbstractVerticle{
 	
 	private void handleClientDisconnect(MqttEndpoint endpoint) {
 		endpoint.disconnectHandler(h -> {
-			System.out.println("The remote client has closed the conection.");
+			System.out.println("El cliente remoto a cerrado la conexion");
 		});
 	}
 	
