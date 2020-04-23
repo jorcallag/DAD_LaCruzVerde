@@ -21,7 +21,7 @@ import types.sensor;
 import types.sensor_valor;
 
 public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
-	
+
 	private String classInstanceId;
 
 	public void start (Promise<Void> promise) {
@@ -36,133 +36,142 @@ public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
 		mqttClientOptions.setUsername("mqttbroker");
 		mqttClientOptions.setPassword("mqttbrokerpass");
 		MqttClient mqttClient = new MqttClientImpl(vertx, mqttClientOptions);
-		
+
 		mqttClient.publishHandler(messageReceivedHandler -> {
 			System.out.println(messageReceivedHandler.payload().toString());
 		});
-		
-		//TOPIC PLANTA
+
+		//TOPIC PLANTA --> Desde la app web deberiamos poder introducir en la bbdd una nueva planta para cuidar
+		//				   La idea es cambiar que sea periodicamente para que sea simplemente cuando se lo mandemos desde
+		//				   la app
 		mqttClient.connect(1885, "localhost", handler -> {
-		if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-			mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-				if(handlerSubscribe.succeeded()) {
-					System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
-					vertx.setPeriodic(10000, periodic -> {
-						planta planta = new planta(1, "Aloevera", 22, 25, 5);
-						mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, Buffer.buffer(Json.encodePrettily(planta)),
-								MqttQoS.AT_LEAST_ONCE, false, true);
-					});
-				}else {
-					System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
-				}
-			});
-		}else {
-			System.out.println("Error: " + handler.result().code());
-		}
-	});		
-				
-		//TOPIC DISPOSITIVO
-//		mqttClient.connect(1885, "localhost", handler -> {
-//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-//					if(handlerSubscribe.succeeded()) {
-//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
-//						vertx.setPeriodic(10000, periodic -> {
-//							Random random = new Random();
-//							dispositivo dispositivo = new dispositivo(random.nextInt(100), random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200), 
-//									"CruzVerde_Aloevera", 1, Calendar.getInstance().getTimeInMillis());
-//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, Buffer.buffer(Json.encodePrettily(dispositivo)),
-//									MqttQoS.AT_LEAST_ONCE, false, true);
-//						});
-//					}else {
-//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
-//					}
-//				});
-//			}else {
-//				System.out.println("Error: " + handler.result().code());
-//			}
-//		});
-		
-		//TOPIC SENSOR
-//		mqttClient.connect(1885, "localhost", handler -> {
-//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-//					if(handlerSubscribe.succeeded()) {
-//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
-//						vertx.setPeriodic(10000, periodic -> {
-//							sensor sensor = new sensor(7, "temp_amb", "temp_amb_aloevera", 1);
-//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, Buffer.buffer(Json.encodePrettily(sensor)),
-//									MqttQoS.AT_LEAST_ONCE, false, true);
-//						});
-//					}else {
-//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
-//					}
-//				});
-//			}else {
-//				System.out.println("Error: " + handler.result().code());
-//			}
-//		});
-		
-		//TOPIC SESNOR_VALOR
-//		mqttClient.connect(1885, "localhost", handler -> {
-//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-//					if(handlerSubscribe.succeeded()) {
-//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
-//						vertx.setPeriodic(10000, periodic -> {
-//							Random random = new Random();
-//							sensor_valor sensor_valor = new sensor_valor(random.nextInt(100), 7, 30 + random.nextInt(8), random.nextInt(3), Calendar.getInstance().getTimeInMillis());
-//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, Buffer.buffer(Json.encodePrettily(sensor_valor)),
-//									MqttQoS.AT_LEAST_ONCE, false, true);
-//						});
-//					}else {
-//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
-//					}
-//				});
-//			}else {
-//				System.out.println("Error: " + handler.result().code());
-//			}
-//		});
-		
-		//TOPIC ACTUADOR
-//				mqttClient.connect(1885, "localhost", handler -> {
-//					if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-//						mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-//							if(handlerSubscribe.succeeded()) {
-//								System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
-//								vertx.setPeriodic(10000, periodic -> {
-//									actuador actuador = new actuador(2, "luz", "luz_aloevera", 1);
-//									mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, Buffer.buffer(Json.encodePrettily(actuador)),
-//											MqttQoS.AT_LEAST_ONCE, false, true);
-//								});
-//							}else {
-//								System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
-//							}
-//						});
-//					}else {
-//						System.out.println("Error: " + handler.result().code());
-//					}
-//				});
-				
-		//TOPIC ACTUADOR_VALOR
-//		mqttClient.connect(1885, "localhost", handler -> {
-//			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
-//				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
-//					if(handlerSubscribe.succeeded()) {
-//						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
-//						vertx.setPeriodic(10000, periodic -> {
-//							Random random = new Random();
-//							actuador_valor actuador_valor = new actuador_valor(random.nextInt(100), 2, random.nextBoolean(), Calendar.getInstance().getTimeInMillis());
-//							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, Buffer.buffer(Json.encodePrettily(actuador_valor)),
-//									MqttQoS.AT_LEAST_ONCE, false, true);
-//						});
-//					}else {
-//						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
-//					}
-//				});
-//			}else {
-//				System.out.println("Error: " + handler.result().code());
-//			}
-//		});
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							planta planta = new planta(1, "Aloevera", 22, 25, 5);
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, Buffer.buffer(Json.encodePrettily(planta)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});		
+
+		//TOPIC DISPOSITIVO --> cuando se conecte un nuevo dispositivo, deberiamos poder introducirle los parametros que necesita 
+		//						para cuidar la planta, este canal introduce en la bbdd los parametros de este nuevo dispositivo
+		//						La idea es cambiar que sea periodicamente para que desde la app asignemos unn dispositivo a una 
+		//						planta y lo pongamos en marcha
+		mqttClient.connect(1885, "localhost", handler -> {
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							Random random = new Random();
+							dispositivo dispositivo = new dispositivo(random.nextInt(100), random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200), 
+									"CruzVerde_Aloevera", 1, Calendar.getInstance().getTimeInMillis());
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, Buffer.buffer(Json.encodePrettily(dispositivo)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});
+
+		//TOPIC SENSOR --> introduce los datos de un sensor en la bbdd
+		//				   La idea es cambiar que sea periodicamente para que se añadan los sensores de un dispositivo, 
+		//				   unicamente una vez para cada dispositivo
+		mqttClient.connect(1885, "localhost", handler -> {
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							sensor sensor = new sensor(7, "temp_amb", "temp_amb_aloevera", 1);
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR, Buffer.buffer(Json.encodePrettily(sensor)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});
+
+		//TOPIC SENSOR_VALOR --> introduce las lecturas de un sensor en la bbdd cada cierto tiempo
+		mqttClient.connect(1885, "localhost", handler -> {
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							Random random = new Random();
+							sensor_valor sensor_valor = new sensor_valor(random.nextInt(100), 7, 30 + random.nextInt(8), random.nextInt(3), Calendar.getInstance().getTimeInMillis());
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR, Buffer.buffer(Json.encodePrettily(sensor_valor)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_SENSOR_VALOR + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});
+
+		//TOPIC ACTUADOR --> introduce los datos de un actuador en la bbdd
+		//				   	 La idea es cambiar que sea periodicamente para que se añadan los sensores de un dispositivo, 
+		//				     unicamente una vez para cada dispositivo
+		mqttClient.connect(1885, "localhost", handler -> {
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							actuador actuador = new actuador(2, "luz", "luz_aloevera", 1);
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR, Buffer.buffer(Json.encodePrettily(actuador)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});
+
+		//TOPIC ACTUADOR_VALOR --> introduce si esta funcionando un actuador en la bbdd cada cierto tiempo
+		mqttClient.connect(1885, "localhost", handler -> {
+			if(handler.result().code() == MqttConnectReturnCode.CONNECTION_ACCEPTED) {
+				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
+					if(handlerSubscribe.succeeded()) {
+						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
+						vertx.setPeriodic(10000, periodic -> {
+							Random random = new Random();
+							actuador_valor actuador_valor = new actuador_valor(random.nextInt(100), 2, random.nextBoolean(), Calendar.getInstance().getTimeInMillis());
+							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR, Buffer.buffer(Json.encodePrettily(actuador_valor)),
+									MqttQoS.AT_LEAST_ONCE, false, true);
+						});
+					}else {
+						System.out.println(classInstanceId + " no suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_ACTUADOR_VALOR + " topic");
+					}
+				});
+			}else {
+				System.out.println("Error: " + handler.result().code());
+			}
+		});
 	}
 }
