@@ -72,7 +72,7 @@ public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
 				mqttClient.subscribe(MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO, MqttQoS.AT_LEAST_ONCE.value(), handlerSubscribe -> {
 					if(handlerSubscribe.succeeded()) {
 						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_DISPOSITIVO + " topic");
-						vertx.setPeriodic(10000, periodic -> {
+						vertx.setPeriodic(5000, periodic -> {
 							Random random = new Random();
 							dispositivo dispositivo = new dispositivo(random.nextInt(100), random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200)+"."+random.nextInt(200), 
 									"CruzVerde_Aloevera", 1, Calendar.getInstance().getTimeInMillis());
@@ -173,5 +173,6 @@ public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
 				System.out.println("Error: " + handler.result().code());
 			}
 		});
+		
 	}
 }
