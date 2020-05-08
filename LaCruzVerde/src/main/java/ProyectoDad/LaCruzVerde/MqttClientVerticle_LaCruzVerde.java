@@ -51,7 +51,7 @@ public class MqttClientVerticle_LaCruzVerde extends AbstractVerticle{
 					if(handlerSubscribe.succeeded()) {
 						System.out.println(classInstanceId + " suscrito a " + MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA + " topic");
 						vertx.setPeriodic(10000, periodic -> {
-							planta planta = new planta(1, "Aloevera", 22, 25, 5);
+							planta planta = new planta(1, "Aloevera", 22, 25);
 							mqttClient.publish(MqttServerVerticle_LaCruzVerde.TOPIC_PLANTA, Buffer.buffer(Json.encodePrettily(planta)),
 									MqttQoS.AT_LEAST_ONCE, false, true);
 						});

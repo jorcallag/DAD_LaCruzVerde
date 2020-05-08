@@ -19,6 +19,8 @@ import io.vertx.sqlclient.Tuple;
 import types.sensor_valor;
 import types.planta;
 import types.sensor;
+import types.actuador;
+import types.actuador_valor;
 import types.dispositivo;
 
 public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
@@ -61,6 +63,14 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 		//Get y Put dispositivo
 		router.get("/api/dispositivo/:id_dispositivo").handler(this::get_dispositivo);
 		router.put("/api/dispositivo").handler(this::put_dispositivo);
+		
+		//Get y Put actuador
+		router.get("/api/actuador/:id_actuador").handler(this::get_actuador);
+		router.put("/api/actuador").handler(this::put_actuador);
+		
+		//Get y Put actuador_valor
+		router.get("/api/actuador_valor/:id_actuador").handler(this::get_actuador_valor);
+		router.put("/api/actuador_valor").handler(this::put_actuador_valor);
 		
 	}
 
@@ -118,8 +128,8 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 		planta planta = Json.decodeValue(routingContext.getBodyAsString(), planta.class);
 		System.out.println(planta.toString());
 		mySQLPool.preparedQuery(
-				"INSERT INTO daddatabase.planta (nombre_planta, temp_amb_planta, humed_tierra_planta, humed_amb_planta) VALUES (?,?,?,?)",
-				Tuple.of(planta.getNombre_planta(), planta.getTemp_amb_planta(), planta.getHumed_tierra_planta(), planta.getHumed_amb_planta()),
+				"INSERT INTO daddatabase.planta (nombre_planta, temp_amb_planta, humed_tierra_planta) VALUES (?,?,?)",
+				Tuple.of(planta.getNombre_planta(), planta.getTemp_amb_planta(), planta.getHumed_tierra_planta()),
 				handler -> {
 					if (handler.succeeded()) {
 						System.out.println("Añadida correctamente");
@@ -148,8 +158,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new planta(row.getInteger("id_planta"),
-									row.getString("nombre_planta"), row.getFloat("temp_amb_planta"), row.getFloat("humed_tierra_planta"),
-									row.getFloat("humed_amb_planta"))));
+									row.getString("nombre_planta"), row.getFloat("temp_amb_planta"), row.getFloat("humed_tierra_planta"))));
 						}
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
@@ -251,12 +260,11 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 					}
 				});
 	}
-	
-	//Las entidades actuador y actuador_valor, no tienen ninguna utilidad, estan diseñados sus metodos pero no seran necesarios.
 
 	//Metodo Put para actuador_valor
-	/*private void put_actuador_valor(RoutingContext routingContext) {
+	private void put_actuador_valor(RoutingContext routingContext) {
 		actuador_valor actuador_valor = Json.decodeValue(routingContext.getBodyAsString(), actuador_valor.class);
+		System.out.println(actuador_valor.toString());
 		mySQLPool.preparedQuery(
 				"INSERT INTO daddatabase.actuador_valor (id_actuador, on, tiempo) VALUES (?,?,?)",
 				Tuple.of(actuador_valor.getId_actuador(), actuador_valor.getOn(), actuador_valor.getTiempo()),
@@ -276,10 +284,10 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
 					}
 				});
-	}*/
+	}
 
 	//Metodo Get para actuador_valor
-	/*private void get_actuador_valor(RoutingContext routingContext) {		
+	private void get_actuador_valor(RoutingContext routingContext) {		
 		mySQLPool.query("SELECT * FROM daddatabase.actuador_valor WHERE id_actuador = "
 				+ routingContext.request().getParam("id_actuador"), res -> {
 					if (res.succeeded()) {
@@ -298,11 +306,12 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
 				});
-	}*/
+	}
 
 	//Metodo Put para actuador
-	/*private void put_actuador(RoutingContext routingContext) {
+	private void put_actuador(RoutingContext routingContext) {
 		actuador actuador = Json.decodeValue(routingContext.getBodyAsString(), actuador.class);
+		System.out.println(actuador.toString());
 		mySQLPool.preparedQuery(
 				"INSERT INTO daddatabase.actuador (tipo, nombre, id_dispositivo) VALUES (?,?,?)",
 				Tuple.of(actuador.getTipo(), actuador.getNombre(), actuador.getId_dispositivo()),
@@ -322,10 +331,10 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
 					}
 				});
-	}*/
+	}
 
 	//Metodo Get para actuador
-	/*private void get_actuador(RoutingContext routingContext) {		
+	private void get_actuador(RoutingContext routingContext) {		
 		mySQLPool.query("SELECT * FROM daddatabase.sensor WHERE id_actuador = "
 				+ routingContext.request().getParam("id_actuador"), res -> {
 					if (res.succeeded()) {
@@ -344,6 +353,6 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
 				});
-	}*/
+	}
 
 }
