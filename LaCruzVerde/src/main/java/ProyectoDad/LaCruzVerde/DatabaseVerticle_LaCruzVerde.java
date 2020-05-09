@@ -266,8 +266,8 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 		actuador_valor actuador_valor = Json.decodeValue(routingContext.getBodyAsString(), actuador_valor.class);
 		System.out.println(actuador_valor.toString());
 		mySQLPool.preparedQuery(
-				"INSERT INTO daddatabase.actuador_valor (id_actuador, on, tiempo) VALUES (?,?,?)",
-				Tuple.of(actuador_valor.getId_actuador(), actuador_valor.getOn(), actuador_valor.getTiempo()),
+				"INSERT INTO daddatabase.actuador_valor (id_actuador, funcionamiento, tiempo) VALUES (?,?,?)",
+				Tuple.of(actuador_valor.getId_actuador(), actuador_valor.getFuncionamiento(), actuador_valor.getTiempo()),
 				handler -> {
 					if (handler.succeeded()) {
 						System.out.println("Añadida correctamente");
@@ -296,7 +296,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new actuador_valor(row.getInteger("id_actuador_valor"),
-									row.getInteger("id_actuador"), row.getBoolean("on"), row.getLong("tiempo"))));
+									row.getInteger("id_actuador"), row.getBoolean("funcionamiento"), row.getLong("tiempo"))));
 						}
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());

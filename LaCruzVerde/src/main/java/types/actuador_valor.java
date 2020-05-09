@@ -4,18 +4,18 @@ public class actuador_valor {
 	
 	private int id_actuador_valor;
 	private int id_actuador;
-	private boolean on;
+	private boolean funcionamiento;
 	private long tiempo;
 	
 	public actuador_valor() {
 		super();
 	}
 
-	public actuador_valor(int id_actuador_valor, int id_actuador, boolean on, long tiempo) {
+	public actuador_valor(int id_actuador_valor, int id_actuador, boolean funcionamiento, long tiempo) {
 		super();
 		this.id_actuador_valor = id_actuador_valor;
 		this.id_actuador = id_actuador;
-		this.on = on;
+		this.funcionamiento = funcionamiento;
 		this.tiempo = tiempo;
 	}
 
@@ -35,12 +35,12 @@ public class actuador_valor {
 		this.id_actuador = id_actuador;
 	}
 
-	public boolean getOn() {
-		return on;
+	public boolean getFuncionamiento() {
+		return funcionamiento;
 	}
 
-	public void setOn(boolean on) {
-		this.on = on;
+	public void setFuncionamiento(boolean funcionamiento) {
+		this.funcionamiento = funcionamiento;
 	}
 
 	public long getTiempo() {
@@ -57,7 +57,7 @@ public class actuador_valor {
 		int result = 1;
 		result = prime * result + id_actuador;
 		result = prime * result + id_actuador_valor;
-		result = prime * result + (on ? 1231 : 1237);
+		result = prime * result + (funcionamiento ? 1231 : 1237);
 		result = prime * result + (int) (tiempo ^ (tiempo >>> 32));
 		return result;
 	}
@@ -75,7 +75,7 @@ public class actuador_valor {
 			return false;
 		if (id_actuador_valor != other.id_actuador_valor)
 			return false;
-		if (on != other.on)
+		if (funcionamiento != other.funcionamiento)
 			return false;
 		if (tiempo != other.tiempo)
 			return false;
@@ -84,7 +84,7 @@ public class actuador_valor {
 
 	@Override
 	public String toString() {
-		return "actuador_valor [id_actuador_valor=" + id_actuador_valor + ", id_actuador=" + id_actuador + ", on=" + on
+		return "actuador_valor [id_actuador_valor=" + id_actuador_valor + ", id_actuador=" + id_actuador + ", funcionamiento=" + funcionamiento
 				+ ", tiempo=" + tiempo + "]";
 	}
 
