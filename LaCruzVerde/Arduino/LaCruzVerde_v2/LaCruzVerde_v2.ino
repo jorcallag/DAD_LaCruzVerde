@@ -1,6 +1,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <NTPClient.h>
 
 //Declaracion de ids de sensores
 const int idSensorTemp = 1;
@@ -49,17 +50,36 @@ WiFiClient client;
 String SSID = "LAGUNAS";
 String PASS = "PeloPicoPata1970";
 String SERVER_IP = "192.168.1.120";
-int SERVER_PORT = 80;
+int SERVER_PORT = 8080;
 
 //Declaracion funciones
 void getPlanta();
 void postMedidaSensor(float medida, int idSensor);
 void postOnActuador(bool endendido, int idActuador);
 
+//Declaracion de variables para timestamp
+long tiempoValor = 0;
+const long utcOffsetInSeconds = 7200;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", utcOffsetInSeconds);
+
 void setup() {
 
   //Inicializacion del puerto Serial
   Serial.begin(9600);
+
+  //Iniciamos la conexion
+  WiFi.begin(SSID.c_str(), PASS.c_str());
+  Serial.printf("Conectando...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.printf(".");
+  }
+  Serial.print("Exito al conectar, IP address: ");
+  Serial.println(WiFi.localIP());
+
+  //Iniciamos el reloj
+  timeClient.begin();
 
   //Inicializacion de pines de sensores
   pinMode(pinSensorLuz, INPUT); //Seleccion de pin para sensor de luz
@@ -140,6 +160,11 @@ void loop() {
   
   //Declaracion de medidas necesarias de la planta
   getPlanta();
+
+  //Declaramos y calculamos el timestamp
+  timeClient.update();
+  String tiempo = String(timeClient.getDay()) + String(timeClient.getHours()) + String(timeClient.getMinutes()) + String(timeClient.getSeconds());
+  tiempoValor = tiempo.toInt();
   
   //Declaracion de variables de medidas (sensores)
   medidaLuz = (100*analogRead(pinSensorLuz))/4095; //Lectura en porcentaje
@@ -162,6 +187,8 @@ void loop() {
   
   //Parte funcional del sistema de riego
   if(medidaLiquidos > 10){
+    ledcWriteTone(canalSonido, 0);
+    postOnActuador(5, 0);
     Serial.println("Tanque lleno");
     if(medidaHumedad < humedadNecesaria){
       Serial.println("La bomba esta ENCENDIDA");
@@ -178,9 +205,6 @@ void loop() {
   }else{
     Serial.println("Hay que rellenar el tanque de agua");
     ledcWriteTone(canalSonido, 500);
-    delay(3000);
-    ledcWriteTone(canalSonido, 0);
-    delay(1000);
     postOnActuador(5, 1);
   }
 
@@ -220,21 +244,28 @@ void getPlanta(){
     http.begin(client, SERVER_IP, SERVER_PORT, "/api/planta/1", true); //URL del recurso
     int httpCode = http.GET();
 
+    Serial.print("Response code: ");
+    Serial.println(httpCode);
+
     String payload = http.getString();
 
-    const size_t capacity = JSON_OBJECT_SIZE(4) + JSON_ARRAY_SIZE(2) + 60;
+    Serial.println(payload);
+
+    const size_t capacity = JSON_OBJECT_SIZE(4) + JSON_ARRAY_SIZE(1) + 60;
     DynamicJsonDocument doc(capacity);
 
     DeserializationError error = deserializeJson(doc, payload);
-    if(error){
-      Serial.print("deserializeJson() failed: ");
-      Serial.println(error.c_str());
-      return;
-    }
-    float temp_amb_planta = doc["temp_amb_planta"].as<float>();
-    float humed_tierra_planta = doc["humed_tierra_planta"].as<float>();
+    //if(error){
+    //  Serial.print("deserializeJson() failed: ");
+    //  Serial.println(error.c_str());
+    //  return;
+    //}
+
+    JsonObject planta = doc[0].as<JsonObject>();
+    
+    float temperaturaNecesaria = planta["temp_amb_planta"].as<float>();
+    float humedadNecesaria = planta["humed_tierra_planta"].as<float>();
   }
-  delay(2000);
 }
 
 //Funciones POST
@@ -244,19 +275,25 @@ void postMedidaSensor(float medida, int idSensor){
     http.begin(client, SERVER_IP, SERVER_PORT, "/api/sensor_valor", true);
     http.addHeader("Content-Type", "application/json");
 
-    const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+    const size_t capacity = JSON_OBJECT_SIZE(4) + JSON_ARRAY_SIZE(0) + 60;
     DynamicJsonDocument doc(capacity);
     doc["id_sensor"] = idSensor;
     doc["valor"]= medida;
     doc["precision_valor"] = 2;
-    doc["timestamp"] = 124123123; //Preguntar como tener un timestamp en tiempo real
+    doc["tiempo"] = 124123123345678; //Preguntar como tener un timestamp en tiempo real
 
     String output;
     serializeJson(doc, output);
 
     int httpCode = http.PUT(output);
 
+    //Serial.print("Response code: ");
+    //Serial.println(httpCode);
+
     String payload = http.getString();
+
+    //Serial.print("Resultado: ");
+    //Serial.println(payload);
   }
 }
 
@@ -266,17 +303,23 @@ void postOnActuador(bool encendido, int idActuador){
     http.begin(client, SERVER_IP, SERVER_PORT, "/api/actuador_valor", true);
     http.addHeader("Content-Type", "application/json");
 
-    const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+    const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(0) + 60;
     DynamicJsonDocument doc(capacity);
-    doc["id_sensor"] = idActuador;
-    doc["on"]= encendido;
-    doc["timestamp"] = 124123123; //Preguntar como tener un timestamp en tiempo real
+    doc["id_actuador"] = idActuador;
+    doc["funcionamiento"]= encendido;
+    doc["tiempo"] = 12412312; //Preguntar como tener un timestamp en tiempo real
 
     String output;
     serializeJson(doc, output);
 
     int httpCode = http.PUT(output);
 
+    //Serial.print("Response code: ");
+    //Serial.println(httpCode);
+
     String payload = http.getString();
+
+    //Serial.print("Resultado: ");
+    //Serial.println(payload);
   }
 }
