@@ -54,6 +54,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 		
 		//Get y Put planta
 		router.get("/api/planta/:id_planta").handler(this::get_planta);
+		router.put("/api/plantaUpdate/:id_planta").handler(this::update_planta);
 		router.put("/api/planta").handler(this::put_planta);
 		
 		//Get y Put sensor
@@ -122,6 +123,26 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 					}
 				});
 	}
+	
+	//Metodo Update para planta
+	private void update_planta(RoutingContext routingContext) {
+        planta planta = Json.decodeValue(routingContext.getBodyAsString(), planta.class);
+        mySQLPool.query(
+                "UPDATE planta SET temp_amb_planta = " + planta.getTemp_amb_planta() + ", humed_tierra_planta = " + planta.getHumed_tierra_planta() + 
+                " WHERE id_planta = " + routingContext.request().getParam("id_planta"),
+                handler -> {
+                    if (handler.succeeded()) {
+                        System.out.println(handler.result().rowCount());
+
+                        routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+                                .end(JsonObject.mapFrom(planta).encodePrettily());
+                    } else {
+                        System.out.println(handler.cause().toString());
+                        routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+                                .end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
+                    }
+                });
+    }
 
 	//Metodo Put para planta
 	private void put_planta(RoutingContext routingContext) {
