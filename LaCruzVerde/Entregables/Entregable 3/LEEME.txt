@@ -1,0 +1,8 @@
+LaCruzVerde, proyecto realizado por:
+-Jorge Luis Calderón Laguna
+-Fernando Fernández Calatayud
+
+Enlace a repositorio Github con el proyecto Vertx: https://github.com/jorcallag/VertexLaCruzVerde
+Enlace a repositorio Github con la BBDD: https://github.com/jorcallag/BBDDLaCruzVerde
+
+Pruebas y explicaciones de los metodos en el Word del archivo .zip

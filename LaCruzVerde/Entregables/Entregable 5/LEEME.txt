@@ -1,0 +1,7 @@
+LaCruzVerde, proyecto realizado por:
+-Jorge Luis Calderón Laguna
+-Fernando Fernández Calatayud
+
+Enlace a repositorio Github con el proyecto completo: "https://github.com/jorcallag/DadLaCruzVerde"
+Encontrará los proyectos de prueba del consumo de API Rest en la carpeta Arduino.
+

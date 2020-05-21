@@ -1,0 +1,7 @@
+Proyecto La Cruz Verde
+
+Autores:
+-Jorge Luis Calderon Laguna
+-Fernando Fernandez Calatayud
+
+Ruta de enlace con Github: "https://github.com/jorcallag/jorcallag/blob/master/DAD/BBDD"
