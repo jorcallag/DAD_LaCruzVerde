@@ -51,7 +51,7 @@ void getPlanta(){
 
     Serial.println(payload);
 
-    const size_t capacity = JSON_OBJECT_SIZE(4) + JSON_ARRAY_SIZE(1) + 60;
+    const size_t capacity = JSON_OBJECT_SIZE(5) + JSON_ARRAY_SIZE(2) + 60;
     DynamicJsonDocument doc(capacity);
 
     DeserializationError error = deserializeJson(doc, payload);

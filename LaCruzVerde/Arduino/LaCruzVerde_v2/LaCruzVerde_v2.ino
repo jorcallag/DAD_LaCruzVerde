@@ -1,4 +1,4 @@
-#include <ArduinoJson.h>
+ #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
@@ -55,7 +55,7 @@ int SERVER_PORT = 8080;
 //Declaracion funciones
 void getPlanta();
 void postMedidaSensor(float medida, int idSensor);
-void postOnActuador(bool endendido, int idActuador);
+void postOnActuador(int idActuador, bool endendido);
 
 //Declaracion de variables para timestamp
 long tiempoValor = 0;
@@ -102,57 +102,58 @@ void setup() {
   Serial.println("Prueba inicial");
   medidaLuz = (100*analogRead(pinSensorLuz))/4095; //Lectura en porcentaje
   medidaHumedad = (100-((100*analogRead(pinSensorHumedad))/4095)); //Lectura en porcentaje
-  medidaTemperatura = analogRead(pinSensorTemperatura)*0,1220703125; //Lectura en grados
+  //medidaTemperatura = ((analogRead(pinSensorTemperatura)*5000)/4096)/10; //Lectura en grados //Esta seria la lectura pero por motivos de un sensor defectuoso subiremos y aumentaremos la temperatura con el metodo random
+  medidaTemperatura = random(0, 50);
   medidaLiquidos = (100*analogRead(pinSensorLiquidos))/4095; //Lectura en porcentaje
   Serial.print("La humedad es del: ");
   Serial.println(medidaHumedad);
-  delay(2000);
+  delay(1000);
   Serial.print("La temperatura es de: ");
   Serial.print(medidaTemperatura);
   Serial.println("º");
-  delay(2000);
+  delay(1000);
   if(medidaLiquidos < 10){
     Serial.println("Tanque casi vacio");
   }else{
     Serial.println("Tanque lleno");
   }
-  delay(2000);
+  delay(1000);
   if(medidaLuz < 20){
     Serial.println("Es de noche!! Luces encendidas!!");
   }else{
     Serial.println("Es de dia!! Luces apagadas");
   } 
-  delay(2000);
+  delay(1000);
   Serial.println("CALEFACTOR ENCENDIDO");
   digitalWrite(25, LOW);
-  delay(2000);
+  delay(1000);
   Serial.println("CALEFACTOR APAGADO");
   digitalWrite(25, HIGH);
-  delay(2000);
+  delay(1000);
   Serial.println("REFRIGERADOR ENCENDIDO");
   digitalWrite(26, LOW);
-  delay(2000);
+  delay(1000);
   Serial.println("REFRIGERADOR APAGADO");
   digitalWrite(26, HIGH);
-  delay(2000);
+  delay(1000);
   Serial.println("LUZ ENCENDIDA");
   digitalWrite(12, LOW);
-  delay(2000);
+  delay(1000);
   Serial.println("LUZ APAGADA");
   digitalWrite(12, HIGH);
-  delay(2000);
+  delay(1000);
   Serial.println("BOMBA ENCENDIDA");
   digitalWrite(27, LOW);  
-  delay(2000);
+  delay(1000);
   Serial.println("BOMBA APAGADA");
   digitalWrite(27, HIGH);
-  delay(2000);
+  delay(1000);
   Serial.println("BUZZER ENCENDIDO");
   ledcWriteTone(canalSonido, 500);
-  delay(2000);
+  delay(1000);
   Serial.println("BUZZER APAGADO");
   ledcWriteTone(canalSonido, 0);
-  delay(2000);
+  delay(1000);
   Serial.println("");
 }
 
@@ -169,10 +170,16 @@ void loop() {
   //Declaracion de variables de medidas (sensores)
   medidaLuz = (100*analogRead(pinSensorLuz))/4095; //Lectura en porcentaje
   medidaHumedad = (100-((100*analogRead(pinSensorHumedad))/4095)); //Lectura en porcentaje
-  medidaTemperatura = analogRead(pinSensorTemperatura)*0,1220703125; //Lectura en grados
+  //medidaTemperatura = ((analogRead(pinSensorTemperatura)*5000)/4096)/10; //Lectura en grados //Esta seria la lectura pero por motivos de un sensor defectuoso subiremos y aumentaremos la temperatura con el moetodo random
+  medidaTemperatura = random(0, 50);
   medidaLiquidos = (100*analogRead(pinSensorLiquidos))/4095; //Lectura en porcentaje
 
   //Imprimimos por el monitor Serial
+  Serial.print("La humedad necesaria para la planta es del: ");
+  Serial.println(humedadNecesaria);
+  Serial.print("La temperatura necesaria para la planta es de: ");
+  Serial.print(temperaturaNecesaria);
+  Serial.println("º");
   Serial.print("La humedad es del: ");
   Serial.println(medidaHumedad);
   Serial.print("La temperatura es de: ");
@@ -180,32 +187,31 @@ void loop() {
   Serial.println("º");
 
   //Enviamos datos de los sensores a la BBDD
-  postMedidaSensor(medidaTemperatura, 1);
-  postMedidaSensor(medidaHumedad, 2);
-  postMedidaSensor(medidaLiquidos, 3);
-  postMedidaSensor(medidaLuz, 4);
+  postMedidaSensor(medidaTemperatura,idSensorTemp);
+  postMedidaSensor(medidaHumedad, idSensorHumed);
+  postMedidaSensor(medidaLiquidos, idSensorLiq);
+  postMedidaSensor(medidaLuz, idSensorLuz);
   
   //Parte funcional del sistema de riego
   if(medidaLiquidos > 10){
     ledcWriteTone(canalSonido, 0);
-    postOnActuador(5, 0);
+    postOnActuador(idActuadorAlarma, 0);
     Serial.println("Tanque lleno");
     if(medidaHumedad < humedadNecesaria){
       Serial.println("La bomba esta ENCENDIDA");
       digitalWrite(pinActuadorBomba, LOW);
       delay(1000);
       digitalWrite(pinActuadorBomba, HIGH);
-      postOnActuador(1, 1);
+      postOnActuador(idActuadorBomba, 1);
     }else{
       Serial.println("La bomba esta APAGADA");
       digitalWrite(pinActuadorBomba, HIGH);
-      postOnActuador(1, 0); //
+      postOnActuador(idActuadorBomba, 0);
     }
-    postOnActuador(5, 0);
   }else{
     Serial.println("Hay que rellenar el tanque de agua");
     ledcWriteTone(canalSonido, 500);
-    postOnActuador(5, 1);
+    postOnActuador(idActuadorAlarma, 1);
   }
 
   //Parte funcional del sistema de control de temperatura
@@ -213,28 +219,31 @@ void loop() {
     Serial.println("El habitaculo se esta calefactando");
     digitalWrite(pinActuadorVentilacion, HIGH);
     digitalWrite(pinActuadorCalor, LOW);
-    postOnActuador(3, 1);
-    postOnActuador(4, 0);
+    postOnActuador(idActuadorResistencia, 1);
+    postOnActuador(idActuadorVentilador, 0);
   }else if(medidaTemperatura > temperaturaNecesaria){
     Serial.println("El habitaculo se esta refrigerando");
     digitalWrite(pinActuadorVentilacion, LOW);
     digitalWrite(pinActuadorCalor, HIGH);
-    postOnActuador(3, 0);
-    postOnActuador(4, 1);
+    postOnActuador(idActuadorResistencia, 0);
+    postOnActuador(idActuadorVentilador, 1);
   }
 
   //Parte funcional del sistema de luminosidad
   if(medidaLuz < 20){
     Serial.println("Es de noche!! Luces encendidas!!");
     digitalWrite(pinActuadorLuz, LOW);
-    postOnActuador(2, 1);
+    postOnActuador(idActuadorLuz, 1);
   }else{
     Serial.println("Es de dia!! Luces apagadas");
     digitalWrite(pinActuadorLuz, HIGH);
-    postOnActuador(2, 0);
+    postOnActuador(idActuadorLuz, 0);
   }
   Serial.println("");
   delay(5000);  
+
+  medidaTemperatura = random(0, 50);
+  //regulaTemperatura();
 }
 
 //Funciones GET
@@ -244,14 +253,14 @@ void getPlanta(){
     http.begin(client, SERVER_IP, SERVER_PORT, "/api/planta/1", true); //URL del recurso
     int httpCode = http.GET();
 
-    Serial.print("Response code: ");
-    Serial.println(httpCode);
+    //Serial.print("Response code: ");
+    //Serial.println(httpCode);
 
     String payload = http.getString();
 
-    Serial.println(payload);
+    //Serial.println(payload);
 
-    const size_t capacity = JSON_OBJECT_SIZE(4) + JSON_ARRAY_SIZE(1) + 60;
+    const size_t capacity = JSON_OBJECT_SIZE(5) + JSON_ARRAY_SIZE(2) + 60;
     DynamicJsonDocument doc(capacity);
 
     DeserializationError error = deserializeJson(doc, payload);
@@ -263,8 +272,8 @@ void getPlanta(){
 
     JsonObject planta = doc[0].as<JsonObject>();
     
-    float temperaturaNecesaria = planta["temp_amb_planta"].as<float>();
-    float humedadNecesaria = planta["humed_tierra_planta"].as<float>();
+    humedadNecesaria = planta["humed_tierra_planta"].as<float>();
+    temperaturaNecesaria = planta["temp_amb_planta"].as<float>();
   }
 }
 
@@ -280,7 +289,7 @@ void postMedidaSensor(float medida, int idSensor){
     doc["id_sensor"] = idSensor;
     doc["valor"]= medida;
     doc["precision_valor"] = 2;
-    doc["tiempo"] = 124123123345678; //Preguntar como tener un timestamp en tiempo real
+    doc["tiempo"] = tiempoValor; //Preguntar como tener un timestamp en tiempo real
 
     String output;
     serializeJson(doc, output);
@@ -297,7 +306,7 @@ void postMedidaSensor(float medida, int idSensor){
   }
 }
 
-void postOnActuador(bool encendido, int idActuador){
+void postOnActuador(int idActuador, bool encendido){
   if (WiFi.status() == WL_CONNECTED){
     HTTPClient http;
     http.begin(client, SERVER_IP, SERVER_PORT, "/api/actuador_valor", true);
@@ -307,7 +316,7 @@ void postOnActuador(bool encendido, int idActuador){
     DynamicJsonDocument doc(capacity);
     doc["id_actuador"] = idActuador;
     doc["funcionamiento"]= encendido;
-    doc["tiempo"] = 12412312; //Preguntar como tener un timestamp en tiempo real
+    doc["tiempo"] = tiempoValor; //Preguntar como tener un timestamp en tiempo real
 
     String output;
     serializeJson(doc, output);

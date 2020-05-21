@@ -124,6 +124,29 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				});
 	}
 	
+	//Metodo Get para sensor_valor
+	private void get_sensor_valor_planta(RoutingContext routingContext) {		
+		mySQLPool.query("SELECT * FROM daddatabase.sensor_valor WHERE id_sensor = "
+				+ routingContext.request().getParam("id_sensor"), res -> {
+					if (res.succeeded()) {
+						RowSet<Row> resultSet = res.result();
+						System.out.println("Consulta satisfactoria");
+						JsonArray result = new JsonArray();
+						for (Row row : resultSet) {
+							result.add(JsonObject.mapFrom(new sensor_valor(row.getInteger("id_sensor_valor"),
+									row.getInteger("id_sensor"), row.getFloat("valor"), row.getFloat("precision_valor"),
+									row.getLong("tiempo"))));
+						}
+						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+						.end(result.encodePrettily());
+					} else {
+						System.out.println("Consulta fallida");
+						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
+					}
+				});
+	}
+	
 	//Metodo Update para planta
 	private void update_planta(RoutingContext routingContext) {
         planta planta = Json.decodeValue(routingContext.getBodyAsString(), planta.class);
