@@ -107,7 +107,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_sensor"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (sensor_valor: " + routingContext.request().getParam("id_sensor") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new sensor_valor(row.getInteger("id_sensor_valor"),
@@ -117,30 +117,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
-						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
-					}
-				});
-	}
-	
-	//Metodo Get para sensor_valor
-	private void get_sensor_valor_planta(RoutingContext routingContext) {		
-		mySQLPool.query("SELECT * FROM daddatabase.sensor_valor WHERE id_sensor = "
-				+ routingContext.request().getParam("id_sensor"), res -> {
-					if (res.succeeded()) {
-						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
-						JsonArray result = new JsonArray();
-						for (Row row : resultSet) {
-							result.add(JsonObject.mapFrom(new sensor_valor(row.getInteger("id_sensor_valor"),
-									row.getInteger("id_sensor"), row.getFloat("valor"), row.getFloat("precision_valor"),
-									row.getLong("tiempo"))));
-						}
-						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-						.end(result.encodePrettily());
-					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (sensor_valor: " + routingContext.request().getParam("id_sensor") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
@@ -155,6 +132,8 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
                 " WHERE id_planta = " + routingContext.request().getParam("id_planta"),
                 handler -> {
                     if (handler.succeeded()) {
+                    	System.out.println("Actualizado correctamente");
+                    	
                         System.out.println(handler.result().rowCount());
 
                         routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
@@ -198,7 +177,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_planta"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (planta: " + routingContext.request().getParam("id_planta") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new planta(row.getInteger("id_planta"),
@@ -207,7 +186,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (planta: " + routingContext.request().getParam("id_planta") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
@@ -245,7 +224,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_sensor"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (sensor: " + routingContext.request().getParam("id_sensor") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new sensor(row.getInteger("id_sensor"),
@@ -254,7 +233,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (sensor: " + routingContext.request().getParam("id_sensor") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
@@ -289,7 +268,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_dispositivo"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (dispositivo: " + routingContext.request().getParam("id_dispositivo") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new dispositivo(row.getInteger("id_dispositivo"),
@@ -298,7 +277,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (dispositivo: " + routingContext.request().getParam("id_dispositivo") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
@@ -336,7 +315,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_actuador"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (actuador_valor: " + routingContext.request().getParam("id_actuador") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new actuador_valor(row.getInteger("id_actuador_valor"),
@@ -345,7 +324,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (actuador_valor: " + routingContext.request().getParam("id_actuador") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
@@ -383,7 +362,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 				+ routingContext.request().getParam("id_actuador"), res -> {
 					if (res.succeeded()) {
 						RowSet<Row> resultSet = res.result();
-						System.out.println("Consulta satisfactoria");
+						System.out.println("Consulta satisfactoria (actuador: " + routingContext.request().getParam("id_actuador") + ")");
 						JsonArray result = new JsonArray();
 						for (Row row : resultSet) {
 							result.add(JsonObject.mapFrom(new actuador(row.getInteger("id_actuador"),
@@ -392,7 +371,7 @@ public class DatabaseVerticle_LaCruzVerde extends AbstractVerticle {
 						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 						.end(result.encodePrettily());
 					} else {
-						System.out.println("Consulta fallida");
+						System.out.println("Consulta fallida (actuador: " + routingContext.request().getParam("id_actuador") + ")");
 						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 						.end((JsonObject.mapFrom(res.cause()).encodePrettily()));
 					}
